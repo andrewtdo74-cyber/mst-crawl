@@ -1,5 +1,6 @@
-"""Logic crawl: tìm tỉnh -> phường/xã (kể cả quận/huyện cũ), rồi quét trang 1..10 mỗi nơi."""
+"""Logic crawl: tìm tỉnh -> xã/phường/đặc khu (phân loại mới), rồi quét trang 1..10 mỗi nơi."""
 import logging
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from . import parser
@@ -8,14 +9,18 @@ from .fetcher import Blocked
 log = logging.getLogger("mst")
 INDEX = "/tra-cuu-ma-so-thue-theo-tinh/"
 MAX_PAGES = 10   # trang chỉ hiển thị tối đa 10 trang (250 công ty) mỗi danh sách
+NEW_UNIT = re.compile(r"/tra-cuu-ma-so-thue-theo-tinh/(xa|phuong|dac-khu)-[a-z0-9-]+-\d+$")
 
 
 def discover(fetcher, store):
+    """Chỉ lấy đơn vị theo phân loại mới (xã / phường / đặc khu), bỏ quận/huyện/thị xã cũ.
+
+    Duyệt cả trang tỉnh cũ vì trang vẫn xếp vài xã mới dưới tỉnh cũ (vd xã Hưng Phú -> Thái Bình).
+    """
     provinces = parser.location_links(fetcher.get(INDEX))
-    prov_set = set(provinces)
-    log.info("Tìm thấy %d tỉnh/thành", len(provinces))
+    log.info("Tìm thấy %d trang tỉnh/thành (gồm cả tỉnh cũ)", len(provinces))
     for p in provinces:
-        links = [l for l in parser.location_links(fetcher.get(p, parser.is_listing)) if l not in prov_set]
+        links = [l for l in parser.location_links(fetcher.get(p, parser.is_listing)) if NEW_UNIT.match(l)]
         store.add_locations([(l, p) for l in links])
         log.info("%s: %d phường/xã", p, len(links))
 

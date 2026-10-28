@@ -1,6 +1,6 @@
 # MST Crawler
 
-Thu thập danh sách doanh nghiệp (MST + tên) từ masothue.com theo **tỉnh → phường/xã** (kể cả quận/huyện cũ trang còn giữ).
+Thu thập danh sách doanh nghiệp (MST + tên) từ masothue.com theo **tỉnh → phường/xã** theo **phân loại mới** (34 tỉnh, ~3.300 xã / phường / đặc khu; bỏ quận/huyện cũ).
 
 Mỗi danh sách trên trang chỉ hiển thị tối đa **10 trang × 25 = 250** công ty mới nhất, nên app quét từng đơn vị nhỏ nhất rồi gộp và lọc trùng theo MST.
 
@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ## Sử dụng
 
 ```bash
-python -m mst_crawler discover                  # 1. lấy danh sách tỉnh -> phường/xã (~4.100 đơn vị)
+python -m mst_crawler discover                  # 1. lấy danh sách tỉnh -> phường/xã (~3.300 xã/phường/đặc khu)
 python -m mst_crawler crawl                     # 2. quét công ty (tự chạy tiếp chỗ dừng)
 python -m mst_crawler crawl --province ha-noi   #    chỉ quét 1 tỉnh
 python -m mst_crawler stats                     # 3. thống kê + tỷ lệ trùng
