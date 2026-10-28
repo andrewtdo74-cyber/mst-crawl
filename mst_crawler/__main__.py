@@ -19,6 +19,7 @@ def main():
     c.add_argument("--workers", type=int, default=1, help="số luồng song song (khuyến nghị 1-2)")
     c.add_argument("--delay", type=float, default=2.0, help="giây nghỉ giữa các request mỗi luồng")
     c.add_argument("--province", help="chỉ quét tỉnh có slug chứa chuỗi này, vd ha-noi")
+    c.add_argument("--provinces", help="danh sách slug tỉnh chính xác, cách nhau dấu phẩy, vd an-giang-93,ha-noi-7")
     sub.add_parser("stats", help="thống kê + tỷ lệ trùng")
     e = sub.add_parser("export", help="xuất CSV công ty (đã lọc trùng)")
     e.add_argument("-o", "--out", default="data/companies.csv")
@@ -34,7 +35,8 @@ def main():
         print(store.stats())
     elif a.cmd == "crawl":
         try:
-            crawler.crawl(Fetcher(delay=a.delay), store, a.workers, a.province)
+            provinces = [p.strip() for p in a.provinces.split(",") if p.strip()] if a.provinces else None
+            crawler.crawl(Fetcher(delay=a.delay), store, a.workers, a.province, provinces)
         except Blocked:
             sys.exit(2)
     elif a.cmd == "stats":

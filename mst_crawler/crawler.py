@@ -43,10 +43,10 @@ def crawl_location(fetcher, path):
     return pages, items
 
 
-def crawl(fetcher, store, workers=1, province=None):
+def crawl(fetcher, store, workers=1, province=None, provinces=None):
     """Quét lần lượt từng tỉnh: xong hết xã/phường của tỉnh này mới sang tỉnh kế."""
     by_province = {}
-    for path, prov in store.pending(province):
+    for path, prov in store.pending(province, provinces):
         by_province.setdefault(prov, []).append(path)
     log.info("Còn %d phường/xã ở %d tỉnh cần quét",
              sum(map(len, by_province.values())), len(by_province))

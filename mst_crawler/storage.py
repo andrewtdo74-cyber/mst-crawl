@@ -37,12 +37,16 @@ class Store:
         with self.lock, self.db:
             self.db.executemany("INSERT OR IGNORE INTO locations(path, province) VALUES (?, ?)", rows)
 
-    def pending(self, province=None):
+    def pending(self, province=None, provinces=None):
+        """province: lọc gần đúng (LIKE); provinces: danh sách slug tỉnh chính xác, vd ['an-giang-93']."""
         q = "SELECT path, province FROM locations WHERE status='pending'"
         args = ()
         if province:
             q += " AND province LIKE ?"
             args = (f"%{province}%",)
+        if provinces:
+            q += f" AND province IN ({','.join('?' * len(provinces))})"
+            args += tuple("/tra-cuu-ma-so-thue-theo-tinh/" + p for p in provinces)
         return self.db.execute(q + " ORDER BY province, path", args).fetchall()
 
     def save_location(self, path, pages, items):
