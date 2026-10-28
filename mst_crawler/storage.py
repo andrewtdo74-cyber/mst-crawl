@@ -29,6 +29,7 @@ class Store:
     def __init__(self, path):
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
         self.db = sqlite3.connect(path, check_same_thread=False)
+        self.db.execute("PRAGMA journal_mode=WAL")  # cho dashboard đọc trong lúc crawl đang ghi
         self.db.executescript(SCHEMA)
         self.lock = threading.Lock()
 

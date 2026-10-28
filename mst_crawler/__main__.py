@@ -22,6 +22,8 @@ def main():
     sub.add_parser("stats", help="thống kê + tỷ lệ trùng")
     e = sub.add_parser("export", help="xuất CSV công ty (đã lọc trùng)")
     e.add_argument("-o", "--out", default="data/companies.csv")
+    d = sub.add_parser("dashboard", help="web theo dõi tiến độ (chạy song song với crawl)")
+    d.add_argument("--port", type=int, default=8000)
 
     a = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
@@ -41,6 +43,9 @@ def main():
         for k, v in s.items():
             print(f"{k:18}: {v:,}")
         print(f"{'duplicate_rate':18}: {dup:,} ({100 * dup / max(s['rows_total'], 1):.2f}%)")
+    elif a.cmd == "dashboard":
+        from .dashboard import serve
+        serve(a.db, a.port)
     elif a.cmd == "export":
         rows = store.db.execute(
             "SELECT c.mst, c.name, l.province, c.first_location FROM companies c "

@@ -23,6 +23,7 @@ python -m mst_crawler discover                  # 1. lấy danh sách tỉnh -> 
 python -m mst_crawler crawl                     # 2. quét công ty lần lượt từng tỉnh (xong tỉnh này mới sang tỉnh kế; tự chạy tiếp chỗ dừng)
 python -m mst_crawler crawl --province ha-noi   #    chỉ quét 1 tỉnh
 python -m mst_crawler stats                     # 3. thống kê + tỷ lệ trùng
+python -m mst_crawler dashboard                 #    web theo dõi tiến độ: http://localhost:8000 (mở terminal khác, chạy song song crawl)
 python -m mst_crawler export -o data/companies.csv   # 4. xuất CSV đã lọc trùng
 ```
 
@@ -50,5 +51,6 @@ docker run --rm -v "$PWD/data:/app/data" mst-crawler stats
 | `mst_crawler/fetcher.py` | HTTP, delay, retry, phát hiện bị chặn |
 | `mst_crawler/parser.py` | tách link & công ty từ HTML |
 | `mst_crawler/storage.py` | SQLite, lọc trùng theo MST |
+| `mst_crawler/dashboard.py` | dashboard web (tiến độ theo tỉnh, tỷ lệ trùng) |
 
 Lưu ý: tôn trọng điều khoản sử dụng của trang và giữ tốc độ thấp.
