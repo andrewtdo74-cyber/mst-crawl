@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ```bash
 python -m mst_crawler discover                  # 1. lấy danh sách tỉnh -> phường/xã (~3.300 xã/phường/đặc khu)
-python -m mst_crawler crawl                     # 2. quét công ty (tự chạy tiếp chỗ dừng)
+python -m mst_crawler crawl                     # 2. quét công ty lần lượt từng tỉnh (xong tỉnh này mới sang tỉnh kế; tự chạy tiếp chỗ dừng)
 python -m mst_crawler crawl --province ha-noi   #    chỉ quét 1 tỉnh
 python -m mst_crawler stats                     # 3. thống kê + tỷ lệ trùng
 python -m mst_crawler export -o data/companies.csv   # 4. xuất CSV đã lọc trùng

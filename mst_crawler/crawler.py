@@ -44,8 +44,20 @@ def crawl_location(fetcher, path):
 
 
 def crawl(fetcher, store, workers=1, province=None):
-    todo = store.pending(province)
-    log.info("Còn %d phường/xã cần quét", len(todo))
+    """Quét lần lượt từng tỉnh: xong hết xã/phường của tỉnh này mới sang tỉnh kế."""
+    by_province = {}
+    for path, prov in store.pending(province):
+        by_province.setdefault(prov, []).append(path)
+    log.info("Còn %d phường/xã ở %d tỉnh cần quét",
+             sum(map(len, by_province.values())), len(by_province))
+    for i, (prov, todo) in enumerate(sorted(by_province.items()), 1):
+        log.info("[%d/%d] Bắt đầu %s: %d phường/xã", i, len(by_province), prov, len(todo))
+        crawl_province(fetcher, store, workers, todo)
+        log.info("[%d/%d] Xong %s | tổng %d MST duy nhất",
+                 i, len(by_province), prov, store.stats()["companies_unique"])
+
+
+def crawl_province(fetcher, store, workers, todo):
     done = 0
     with ThreadPoolExecutor(workers) as pool:
         futures = {pool.submit(crawl_location, fetcher, p): p for p in todo}
@@ -56,9 +68,7 @@ def crawl(fetcher, store, workers=1, province=None):
                 store.save_location(path, pages, items)
                 done += 1
                 if done % 20 == 0:
-                    s = store.stats()
-                    log.info("%d/%d xong | %d dòng | %d MST duy nhất",
-                             done, len(todo), s["rows_total"], s["companies_unique"])
+                    log.info("  %d/%d xong", done, len(todo))
         except Blocked as e:
             log.error("Bị chặn tại %s -> dừng. Chạy lại lệnh crawl sau để tiếp tục.", e)
             for f in futures:

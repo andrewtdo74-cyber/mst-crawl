@@ -37,12 +37,12 @@ class Store:
             self.db.executemany("INSERT OR IGNORE INTO locations(path, province) VALUES (?, ?)", rows)
 
     def pending(self, province=None):
-        q = "SELECT path FROM locations WHERE status='pending'"
+        q = "SELECT path, province FROM locations WHERE status='pending'"
         args = ()
         if province:
             q += " AND province LIKE ?"
             args = (f"%{province}%",)
-        return [r[0] for r in self.db.execute(q + " ORDER BY path", args)]
+        return self.db.execute(q + " ORDER BY province, path", args).fetchall()
 
     def save_location(self, path, pages, items):
         with self.lock, self.db:
